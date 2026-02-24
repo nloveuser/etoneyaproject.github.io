@@ -1,712 +1,133 @@
 <!DOCTYPE html>
-<html lang="ru" class="scroll-smooth">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ЭтоНеЯ | Ключи к цифровой свободе</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;600;800&display=swap');
-      
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #000;
-        color: #fff;
-        margin: 0;
-        overflow-x: hidden;
-      }
-
-      .mono-font {
-        font-family: 'JetBrains Mono', monospace;
-      }
-
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-
-      @keyframes wave-glitch {
-        0% { transform: translate(0); clip-path: inset(40% 0 61% 0); }
-        20% { clip-path: inset(92% 0 1% 0); }
-        40% { clip-path: inset(43% 0 1% 0); }
-        60% { clip-path: inset(25% 0 58% 0); }
-        80% { clip-path: inset(54% 0 7% 0); }
-        100% { clip-path: inset(58% 0 43% 0); }
-      }
-
-      .glitch-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        background-size: 100% 2px, 3px 100%;
-        pointer-events: none;
-      }
-
-      .snow-particle {
-        position: fixed; background: white; border-radius: 50%;
-        pointer-events: none; z-index: 1000; transition-colors duration-500;
-      }
-
-      .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-      .reveal-active { opacity: 1; transform: translateY(0); }
-      .subscription-btn { min-width: 140px; }
-      
-      .category-content.hidden { display: none; }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ЭтоНеЯ | Ключи к цифровой свободе</title>
+  
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="index.css">
 </head>
-<body class="bg-black text-white theme-black">
-    <div id="loading-screen" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-[200]">
-      <div class="relative">
-        <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white opacity-20">ЭтоНеЯ</h1>
-        <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white absolute inset-0 animate-[wave-glitch_1s_infinite]">ЭтоНеЯ</h1>
-      </div>
-      <p class="mt-8 mono-font text-gray-500 animate-pulse text-center px-4">ESTABLISHING SECURE CONNECTION...</p>
-    </div>
+<body>
+  <div class="bg-glow"></div>
+  <div class="toast-container" id="toastContainer"></div>
 
-    <div id="app-wrapper" class="min-h-screen transition-colors duration-500 selection:bg-gray-500/30 overflow-x-hidden relative opacity-0">
+  <!-- Developer Modal -->
+  <div class="modal-overlay" id="devModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">
+        <i data-lucide="x"></i>
+      </button>
       
-      <div id="waves-background" class="fixed inset-0 pointer-events-none opacity-20 z-0 transition-colors duration-500">
-        <svg class="w-full h-full" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+      <div class="modal-avatar">
+        <img src="https://github.com/yamixdev.png" alt="ilushadev">
       </div>
-
-      <div id="snowfall-container"></div>
       
-      <div id="toast-container"></div>
-
-      <nav class="fixed right-2 md:right-10 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50">
-        <button data-section="about" class="nav-link group flex items-center justify-end gap-3 transition-all duration-300 opacity-100">
-            <span class="nav-label text-[10px] mono-font hidden md:block group-hover:block uppercase tracking-widest bg-black/50 backdrop-blur-sm px-2 py-1 rounded">О ПРОЕКТЕ</span>
-            <div class="nav-dot w-2 h-2 rounded-full border border-white bg-white scale-150"></div>
-        </button>
-        <button data-section="info" class="nav-link group flex items-center justify-end gap-3 transition-all duration-300 opacity-40 hover:opacity-100">
-            <span class="nav-label text-[10px] mono-font hidden md:block group-hover:block uppercase tracking-widest bg-black/50 backdrop-blur-sm px-2 py-1 rounded">ИНФОРМАЦИЯ</span>
-            <div class="nav-dot w-2 h-2 rounded-full border border-white bg-transparent"></div>
-        </button>
-        <button data-section="subscriptions" class="nav-link group flex items-center justify-end gap-3 transition-all duration-300 opacity-40 hover:opacity-100">
-            <span class="nav-label text-[10px] mono-font hidden md:block group-hover:block uppercase tracking-widest bg-black/50 backdrop-blur-sm px-2 py-1 rounded">ПОДПИСКИ</span>
-            <div class="nav-dot w-2 h-2 rounded-full border border-white bg-transparent"></div>
-        </button>
-        <button data-section="cooperation" class="nav-link group flex items-center justify-end gap-3 transition-all duration-300 opacity-40 hover:opacity-100">
-            <span class="nav-label text-[10px] mono-font hidden md:block group-hover:block uppercase tracking-widest bg-black/50 backdrop-blur-sm px-2 py-1 rounded">ИНСТРУКЦИЯ</span>
-            <div class="nav-dot w-2 h-2 rounded-full border border-white bg-transparent"></div>
-        </button>
-        <button data-section="contact" class="nav-link group flex items-center justify-end gap-3 transition-all duration-300 opacity-40 hover:opacity-100">
-            <span class="nav-label text-[10px] mono-font hidden md:block group-hover:block uppercase tracking-widest bg-black/50 backdrop-blur-sm px-2 py-1 rounded">СВЯЗЬ</span>
-            <div class="nav-dot w-2 h-2 rounded-full border border-white bg-transparent"></div>
-        </button>
-      </nav>
-
-      <div class="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-50 flex flex-col gap-4">
-        <button id="snow-toggle" class="theme-card bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg text-xs mono-font hover:opacity-80 transition-all flex items-center gap-2">
-          <i class="fas fa-snowflake"></i>
-          <span>Снежок на носик</span>
-        </button>
-        <button id="theme-toggle" class="theme-card bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg text-xs mono-font hover:opacity-80 transition-all flex items-center gap-2">
-          <i class="fas fa-sun"></i>
-          <span>Это все потому что я чорни?)</span>
-        </button>
+      <h3 class="modal-name">ilushadev</h3>
+      <span class="modal-aka">aka <span class="text-gradient">ILO</span></span>
+      
+      <p class="modal-desc">
+        Создаю стиль и делаю по кайфу:3
+      </p>
+      
+      <div class="modal-links">
+        <a href="https://github.com/yamixdev" target="_blank" class="modal-link">
+          <i data-lucide="github"></i>
+          Мой GitHub
+        </a>
+        <a href="https://yamixdev.github.io/bio/" target="_blank" class="modal-link">
+          <i data-lucide="globe"></i>
+          Сайт-визитка
+        </a>
       </div>
-
-      <main class="relative z-10 container mx-auto px-4 md:px-6 py-10 md:py-20">
-        
-        <section id="about" class="min-h-screen flex flex-col justify-center items-center text-center mb-10 md:mb-40">
-          <div class="relative mb-6 md:mb-12 group reveal">
-            <h1 class="text-5xl md:text-[10rem] font-extrabold tracking-tighter leading-none mb-4 group-hover:scale-105 transition-transform duration-700 break-words max-w-full">
-              ЭтоНеЯ
-            </h1>
-            <div class="absolute inset-0 bg-white/5 blur-3xl rounded-full -z-10 animate-pulse"></div>
-          </div>
-          
-          <div class="theme-card w-full max-w-3xl bg-white/5 border border-white/10 p-6 md:p-12 rounded-3xl backdrop-blur-xl transition-all duration-500 reveal">
-            <p class="text-lg md:text-2xl leading-relaxed opacity-90 mb-6 md:mb-8 italic">
-              "ЭтоНеЯ или ЦеЯ-созданы для помощи обычным людям в ситуации когда идет ограничение интернета в виде белых списков, запретов, или санкций."
-            </p>
-            <p class="text-base md:text-lg opacity-70 mb-8">
-              Наш проект помогает вам обойти эти ограничения. На этом сайте вы можете найти как основную так и дополнительную информацию о проекте. Ниже находятся справочники и ссылки.
-            </p>
-            <div class="flex flex-wrap justify-center gap-4">
-              <span class="theme-badge px-4 py-2 rounded-full font-bold text-xs md:text-sm bg-white text-black">
-                ✌️
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <section id="info" class="py-10 md:py-20 space-y-16 md:space-y-32">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center reveal">
-            <div class="space-y-6">
-              <h2 class="text-3xl md:text-5xl font-bold uppercase italic tracking-tighter">Полезные ресурсы</h2>
-              <p class="opacity-70 text-base md:text-lg">Доступ к нашей экосистеме и сообществу. Мы работаем там, где другие сдаются.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="https://t.me/YoutubeUnBlockRU" target="_blank" class="theme-card p-6 bg-white/5 border border-white/10 rounded-2xl hover:translate-y-[-4px] transition-all">
-                <i class="fab fa-telegram-plane text-3xl mb-4 text-sky-500"></i>
-                <h3 class="text-xl font-bold mb-2 italic">Основной канал</h3>
-                <p class="text-sm opacity-60">Главное сообщество в Telegram.</p>
-              </a>
-              <button id="neptun-btn" class="theme-card p-6 bg-white/5 border border-white/10 rounded-2xl hover:translate-y-[-4px] transition-all text-left">
-                <i class="fas fa-satellite text-3xl mb-4 text-purple-500"></i>
-                <h3 class="text-xl font-bold mb-2 italic">Neptun</h3>
-                <p class="text-sm opacity-60">Тех. обслуживание и инструментарий.</p>
-              </button>
-              <div class="theme-card p-6 bg-white/5 border border-white/10 rounded-2xl opacity-60 cursor-wait">
-                <i class="fas fa-clock text-3xl mb-4 text-gray-500"></i>
-                <h3 class="text-xl font-bold mb-2 italic">Ожидайте</h3>
-                <p class="text-sm opacity-60 italic">Чёто тут будет потом</p>
-              </div>
-              <div class="theme-card p-6 bg-white/5 border border-white/10 rounded-2xl opacity-60 cursor-wait">
-                <i class="fas fa-clock text-3xl mb-4 text-gray-500"></i>
-                <h3 class="text-xl font-bold mb-2 italic">Ожидайте</h3>
-                <p class="text-sm opacity-60 italic">Чёто тут будет потом</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center reveal">
-            <div class="order-2 lg:order-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="theme-card p-6 md:p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-lg">
-                <h3 class="text-xl font-bold mb-1 italic">A9FM</h3>
-                <h4 class="text-blue-500 text-sm mb-4 font-bold mono-font uppercase">Главный СвиноZондбе</h4>
-                <p class="text-sm opacity-70 leading-relaxed">Основатель проекта. Отвечает за стратегию, финансирование и общее руководство. Имеет связи в нужных кругах.</p>
-              </div>
-              <div class="theme-card p-6 md:p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-lg">
-                <h3 class="text-xl font-bold mb-1 italic">Благодарность</h3>
-                <h4 class="text-yellow-600 text-sm mb-4 font-bold mono-font uppercase">Спонсоры и Сообщество</h4>
-                <div class="text-xs opacity-70 leading-relaxed space-y-1">
-                  <p>Спасибо подпискам: <b>Igareck</b>, <b>LowiK</b>, <b>ByeWhiteLists</b>, <b>YzeNet</b></p>
-                  <p>И волонтёрам: <b>Slutvibe</b>, <b>AR34</b>, <b>Langar1337</b>, <b>Miroslav_off</b>, <b>Pinochet420</b>, <b>activist0ff</b>, <b>mazepaa</b>, <b>FlexVerified</b>, <b>nloverx</b></p>
-                </div>
-              </div>
-            </div>
-            <div class="order-1 lg:order-2 space-y-6 text-left lg:text-right">
-              <h2 class="text-3xl md:text-5xl font-bold uppercase italic tracking-tighter">Создатели & Спонсоры</h2>
-              <p class="opacity-70 text-base md:text-lg">Команда энтузиастов, верящих в свободный интернет без границ и цензуры.</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="subscriptions" class="py-10 md:py-20"></section>
-
-        <section id="cooperation" class="py-10 md:py-20">
-          <div class="theme-card bg-white/5 border border-white/10 rounded-[2.5rem] p-6 md:p-12 backdrop-blur-lg reveal">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div class="reveal">
-                <h2 class="text-3xl md:text-4xl font-black italic mb-8 uppercase tracking-tighter">Инструкция по использованию</h2>
-                <div class="space-y-6">
-                  <div class="flex gap-4 items-start">
-                      <div class="theme-badge w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold flex-shrink-0 mt-1">1</div>
-                      <p class="opacity-80 text-lg md:text-xl leading-snug">Скопируйте подписку полностью (клик по кнопке выше)</p>
-                  </div>
-                  <div class="flex gap-4 items-start">
-                      <div class="theme-badge w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold flex-shrink-0 mt-1">2</div>
-                      <p class="opacity-80 text-lg md:text-xl leading-snug">Вставьте в соответствующий клиент (V2RayNG, V2Box, Streisand, Nekobox и т.д.)</p>
-                  </div>
-                  <div class="flex gap-4 items-start">
-                      <div class="theme-badge w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold flex-shrink-0 mt-1">3</div>
-                      <p class="opacity-80 text-lg md:text-xl leading-snug">Выберите и активируйте соединение</p>
-                  </div>
-                  <div class="flex gap-4 items-start">
-                      <div class="theme-badge w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-bold flex-shrink-0 mt-1">4</div>
-                      <p class="opacity-80 text-lg md:text-xl leading-snug">Проверьте IP на 2ip.io или ipleak.net</p>
-                  </div>
-                </div>
-              </div>
-              <div class="flex flex-col justify-center reveal">
-                 <div class="bg-red-500/10 border border-red-500/30 p-8 rounded-3xl space-y-6 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-red-500 animate-pulse"></div>
-                    <div class="flex items-center gap-3 text-red-600 font-black italic text-xl md:text-2xl">
-                       <i class="fas fa-skull-crossbones"></i>
-                       ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ
-                    </div>
-                    <div class="space-y-4 text-sm md:text-base text-red-600/80 leading-relaxed font-medium">
-                      <p>Как минимум не скачивайте <b>Max</b>, <b>Vk</b>, <b>Гос. Услуги</b></p>
-                      <p>Эти приложения могут собирать ваши данные и передавать их третьим лицам</p>
-                    </div>
-                    <div class="pt-4 border-t border-red-500/20 space-y-2 text-xs md:text-sm italic opacity-60">
-                      <p>Че-то там думайте...</p>
-                      <p>Че-то там за нами!!!</p>
-                      <p class="font-bold opacity-100">Мысли свободны. Действия осознанны.</p>
-                      <p class="text-sky-500 font-bold">🔑 Ключи обновляются частенько</p>
-                    </div>
-                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" class="py-10 md:py-20 min-h-[60vh] flex items-center">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full reveal">
-            <div class="space-y-6 md:space-y-8 flex flex-col justify-center text-left">
-              <h2 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none">КОНТАКТЫ ДЛЯ СВЯЗИ</h2>
-              <p class="opacity-60 text-base md:text-lg max-w-md">Мы всегда на связи для решения ваших вопросов и предложений.</p>
-              <div class="flex items-center gap-4 text-xl md:text-2xl font-black mono-font break-all group">
-                <i class="fab fa-telegram text-sky-500 group-hover:scale-125 transition-transform"></i>
-                <a 
-                  href="https://t.me/YoutubeUnBlockRu" 
-                  target="_blank" 
-                  class="underline underline-offset-8 decoration-sky-500/30 hover:decoration-sky-500 transition-all"
-                >
-                  t.me/YoutubeUnBlockRu
-                </a>
-              </div>
-            </div>
-            
-            <div class="grid grid-cols-1 gap-4 self-center">
-              <a href="https://t.me/EtoNeYaSupportBot" target="_blank" class="group flex items-center justify-between p-6 theme-card bg-white/5 border border-white/10 rounded-2xl hover:translate-x-2 transition-all reveal">
-                  <div class="flex items-center gap-4 md:gap-6">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/10 theme-icon-bg rounded-xl flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all">
-                      <i class="fas fa-headset text-lg md:text-xl"></i>
-                    </div>
-                    <span class="text-lg md:text-xl font-bold italic">Техподдержка</span>
-                  </div>
-                  <i class="fas fa-chevron-right opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0"></i>
-                </a>
-                <a href="https://t.me/EtoNeYaSupportBot" target="_blank" class="group flex items-center justify-between p-6 theme-card bg-white/5 border border-white/10 rounded-2xl hover:translate-x-2 transition-all reveal">
-                  <div class="flex items-center gap-4 md:gap-6">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/10 theme-icon-bg rounded-xl flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all">
-                      <i class="fas fa-bug text-lg md:text-xl"></i>
-                    </div>
-                    <span class="text-lg md:text-xl font-bold italic">Багрепорты</span>
-                  </div>
-                  <i class="fas fa-chevron-right opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0"></i>
-                </a>
-                <a href="https://t.me/EtoNeYaSupportBot" target="_blank" class="group flex items-center justify-between p-6 theme-card bg-white/5 border border-white/10 rounded-2xl hover:translate-x-2 transition-all reveal">
-                  <div class="flex items-center gap-4 md:gap-6">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/10 theme-icon-bg rounded-xl flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all">
-                      <i class="fas fa-handshake text-lg md:text-xl"></i>
-                    </div>
-                    <span class="text-lg md:text-xl font-bold italic">Сотрудничество</span>
-                  </div>
-                  <i class="fas fa-chevron-right opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0"></i>
-                </a>
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      <footer class="theme-footer relative z-10 py-10 md:py-20 border-t border-white/10 bg-black/80 backdrop-blur-md reveal">
-        <div class="container mx-auto px-6 text-center">
-          <div class="text-xl md:text-3xl font-black mb-6 tracking-widest opacity-80 uppercase italic">
-            Єто ◦ Ні ◦ Я | Это ◦ Не ◦ Я | Це ◦ Я
-          </div>
-          <div class="max-w-xl mx-auto space-y-4 mb-8 md:mb-12">
-            <p class="text-base md:text-lg font-bold mono-font italic uppercase">Ключи к цифровой свободе. Сила трёх букв.</p>
-            <p class="text-xs md:text-sm opacity-50 leading-relaxed italic">
-              © 2026 Єто ◦ Ні ◦ Я | Это ◦ Не ◦ Я | Це ◦ Я. Для образовательных целей(ну почти). 
-              <br/>Свобода — это право, которого у вас нету и не будет xD).
-            </p>
-          </div>
-          <div class="flex justify-center gap-8 text-xl md:text-2xl opacity-40">
-            <a href="https://t.me/YoutubeUnBlockRu" target="_blank" class="hover:opacity-100 transition-opacity"><i class="fab fa-telegram"></i></a>
-          </div>
-        </div>
-      </footer>
-
-      <div id="glitch-overlay" class="glitch-overlay pointer-events-none transition-opacity duration-500 opacity-100"></div>
     </div>
+  </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    let snowActive = false;
-    let currentTheme = 'black';
-    let snowInterval;
-    const subCategories = [
-        { 
-            title: "ТОЛЬКО БЕЛЫЕ СПИСКИ", 
-            icon: "fa-list-check", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/whitelist" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/whitelist" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/whitelist" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/whitelist" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/whitelist&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/whitelist" }
-            ] 
-        },
-        { 
-            title: "РАБОТАЕТ ГЕМИНИ", 
-            icon: "fa-brain", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/gemini" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/gemini" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/gemini" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/gemini" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/gemini&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/gemini" }
-            ] 
-        },
-        { 
-            title: "РАБОТАЕТ ЮТУБ", 
-            icon: "fa-brands fa-youtube", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/youtube" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/youtube" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/youtube" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/youtube" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/youtube&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/youtube" }
-            ] 
-        },
-        { 
-            title: "РАБОТАЕТ ЮТУБ МУЗЫКА", 
-            icon: "fa-music", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/ytm" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/ytm" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/ytm" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/ytm" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/ytm&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/ytm" }
-            ] 
-        },
-        { 
-            title: "ДРУГИЕ", 
-            icon: "fa-ellipsis-h", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/other" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/other" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/other" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/other" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/other&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/other" }
-            ] 
-        },
-        { 
-            title: "ВСЕ ВМЕСТЕ", 
-            icon: "fa-layer-group", 
-            links: [ 
-                { label: "Основа №1", url: "https://etoneya.a9fm.site/1" }, 
-                { label: "Основа №2", url: "https://etoneya.a9fm.site/2" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/1" }, 
-                { label: "Зеркало №2", url: "https://alley.serv00.net/2" }, 
-                { label: "Зеркало №3", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/1" }, 
-                { label: "Зеркало №4", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/2" }, 
-                { label: "Зеркало №5", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/1" }, 
-                { label: "Зеркало №6", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/1&lang=en-ru" },
-                { label: "Зеркало №7", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/1" },
-                { label: "Зеркало №8", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/2" }
-            ] 
-        },
-        { 
-            title: "ТЕСТОВАЯ", 
-            icon: "fa-flask", 
-            links: [ 
-                { label: "Основа", url: "https://etoneya.a9fm.site/test" }, 
-                { label: "Зеркало №1", url: "https://alley.serv00.net/test" }, 
-                { label: "Зеркало №2", url: "https://raw.githubusercontent.com/EtoNeYaProject/etoneyaproject.github.io/refs/heads/main/test" }, 
-                { label: "Зеркало №3", url: "https://cdn.jsdelivr.net/gh/EtoNeYaProject/EtoNeYaProject.github.io@refs/heads/main/test" }, 
-                { label: "Зеркало №4", url: "https://translate.yandex.ru/translate?url=https://etoneya.a9fm.site/test&lang=en-ru" },
-                { label: "Зеркало №5", url: "https://gitverse.ru/api/repos/nloverx/EtoNeYa_Subs/raw/branch/master/test" }
-            ] 
-        }
-    ];
-
-    const loadingScreen = document.getElementById('loading-screen');
-    const appWrapper = document.getElementById('app-wrapper');
-    const wavesSVG = document.querySelector('#waves-background svg');
-    const snowfallContainer = document.getElementById('snowfall-container');
-    const toastContainer = document.getElementById('toast-container');
-    const snowToggle = document.getElementById('snow-toggle');
-    const themeToggle = document.getElementById('theme-toggle');
-    const neptunBtn = document.getElementById('neptun-btn');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('section[id]');
-    const subscriptionsSection = document.getElementById('subscriptions');
-    const glitchOverlay = document.getElementById('glitch-overlay');
-    
-    const init = () => {
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            appWrapper.style.opacity = '1';
-            initRevealObserver();
-            initNavObserver();
-        }, 2000);
-
-        generateSubscriptionSection();
-        generateWaves();
-        setupEventListeners();
-    };
-
-    const initRevealObserver = () => {
-        const revealElements = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal-active');
-                    }
-                });
-            }, { threshold: 0.1 }
-        );
-        revealElements.forEach(el => observer.observe(el));
-    };
-    
-    const initNavObserver = () => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-                        updateActiveNav(id);
-                    }
-                });
-            }, { rootMargin: "-50% 0% -50% 0%" }
-        );
-        sections.forEach(section => observer.observe(section));
-    };
-
-    const updateActiveNav = (activeId) => {
-        navLinks.forEach(link => {
-            const sectionId = link.dataset.section;
-            const dot = link.querySelector('.nav-dot');
-            if (sectionId === activeId) {
-                link.classList.remove('opacity-40', 'hover:opacity-100');
-                link.classList.add('opacity-100');
-                dot.classList.add('scale-150');
-                if (currentTheme === 'black') dot.classList.add('bg-white'); else dot.classList.add('bg-black');
-            } else {
-                link.classList.remove('opacity-100');
-                link.classList.add('opacity-40', 'hover:opacity-100');
-                dot.classList.remove('scale-150', 'bg-white', 'bg-black');
-            }
-        });
-    };
-    
-    const setupEventListeners = () => {
-        snowToggle.addEventListener('click', handleSnowToggle);
-        themeToggle.addEventListener('click', handleThemeToggle);
-        neptunBtn.addEventListener('click', () => showToast("Oops... Sory Нептун не воркает сегодня :("));
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                const sectionId = link.dataset.section;
-                document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-    };
-
-    const generateSubscriptionSection = () => {
-        let content = `<div class="text-center mb-10 md:mb-16 reveal">
-            <h2 class="text-4xl md:text-6xl font-black mb-4 italic tracking-tight">АКТИВИРОВАТЬ ПОДПИСКУ</h2>
-            <p class="opacity-50 mono-font text-xs md:text-sm uppercase">Copy your access protocol keys</p>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="hero-anim delay-1">
+        <div class="logo-ring">
+          <i data-lucide="key-round"></i>
         </div>
-        <div class="space-y-6 max-w-5xl mx-auto">`;
+      </div>
+      
+      <div class="hero-anim delay-2">
+        <h1>ЭТО <span class="text-red">НЕ</span> Я</h1>
+      </div>
+      
+      <div class="hero-anim delay-3">
+        <p class="subtitle">Премиум ключи к цифровой свободе. Быстро. Безопасно. Красиво.</p>
+      </div>
+    </div>
+  </header>
 
-        subCategories.forEach((cat, idx) => {
-            content += `<div class="reveal theme-card bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300">
-                <button data-category-title="${cat.title}" class="category-toggle w-full flex items-center justify-between p-6 hover:bg-gray-500/5 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl theme-icon-bg bg-white/10">
-                            <i class="fas ${cat.icon} ${cat.title === 'РАБОТАЕТ ЮТУБ' ? 'text-red-500' : 'text-sky-500'}"></i>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold italic">${cat.title}</h3>
-                    </div>
-                    <i class="chevron fas fa-chevron-down transition-transform duration-300"></i>
-                </button>
-                <div data-content-title="${cat.title}" class="category-content hidden p-6 pt-0 border-t border-white/5 bg-black/5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                        ${cat.links.map(link => `
-                            <div class="flex flex-col gap-2">
-                               <span class="text-[10px] uppercase font-bold opacity-40 mono-font ml-1">${link.label}</span>
-                               <button data-copy-url="${link.url}" class="copy-btn subscription-btn flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border border-white/10 hover:bg-white hover:text-black">
-                                <i class="fas fa-copy opacity-50"></i>
-                                КОПИРОВАТЬ
-                              </button>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </div>`;
-        });
-
-        content += `</div>`;
-        subscriptionsSection.innerHTML = content;
-
-        document.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            copyToClipboard(e.currentTarget.dataset.copyUrl);
-            alert('Скопировано!');
-        }));
-
-        document.querySelectorAll('.category-toggle').forEach(btn => btn.addEventListener('click', (e) => {
-            const title = e.currentTarget.dataset.categoryTitle;
-            const content = document.querySelector(`[data-content-title="${title}"]`);
-            const chevron = e.currentTarget.querySelector('.chevron');
-            
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                content.classList.add('animate-fadeIn');
-                chevron.classList.add('rotate-180');
-            } else {
-                content.classList.add('hidden');
-                content.classList.remove('animate-fadeIn');
-                chevron.classList.remove('rotate-180');
-            }
-        }));
-    };
+  <!-- Main Content -->
+  <main class="container">
+    <h2 class="section-title">Актуальные Ключи</h2>
     
-    const handleSnowToggle = () => {
-        snowActive = !snowActive;
-        const btn = snowToggle;
-        btn.querySelector('span').textContent = snowActive ? 'Убрать снежок' : 'Снежок на носик';
-        if (snowActive) startSnowfall(); else stopSnowfall();
-    };
-
-    const handleThemeToggle = () => {
-        currentTheme = currentTheme === 'black' ? 'white' : 'black';
-        const isBlack = currentTheme === 'black';
-
-        document.body.classList.toggle('bg-black', isBlack);
-        document.body.classList.toggle('text-white', isBlack);
-        document.body.classList.toggle('bg-white', !isBlack);
-        document.body.classList.toggle('text-black', !isBlack);
-        document.body.classList.toggle('theme-black', isBlack);
-        document.body.classList.toggle('theme-white', !isBlack);
-
-        const btn = themeToggle;
-        btn.querySelector('i').className = isBlack ? 'fas fa-sun' : 'fas fa-moon';
-        btn.querySelector('span').textContent = isBlack ? 'Это все потому что я чорни?)' : 'Это все потому что я бели?)';
-
-        const themeCards = document.querySelectorAll('.theme-card');
-        const themeBadges = document.querySelectorAll('.theme-badge');
-        const copyBtns = document.querySelectorAll('.copy-btn');
-        const navLabels = document.querySelectorAll('.nav-label');
-        const navDots = document.querySelectorAll('.nav-dot');
-        const themeIconBgs = document.querySelectorAll('.theme-icon-bg');
-        
-        themeCards.forEach(el => {
-            el.classList.toggle('bg-white/5', isBlack);
-            el.classList.toggle('border-white/10', isBlack);
-            el.classList.toggle('bg-black/5', !isBlack);
-            el.classList.toggle('border-black/10', !isBlack);
-        });
-        
-        themeBadges.forEach(el => {
-            el.classList.toggle('bg-white', isBlack);
-            el.classList.toggle('text-black', isBlack);
-            el.classList.toggle('bg-black', !isBlack);
-            el.classList.toggle('text-white', !isBlack);
-        });
-
-        copyBtns.forEach(el => {
-            el.classList.toggle('border-white/10', isBlack);
-            el.classList.toggle('hover:bg-white', isBlack);
-            el.classList.toggle('hover:text-black', isBlack);
-            el.classList.toggle('border-black/10', !isBlack);
-            el.classList.toggle('hover:bg-black', !isBlack);
-            el.classList.toggle('hover:text-white', !isBlack);
-        });
-
-        navLabels.forEach(el => {
-            el.classList.toggle('bg-black/50', isBlack);
-            el.classList.toggle('bg-white/50', !isBlack);
-        });
-
-        navDots.forEach(el => {
-            el.classList.toggle('border-white', isBlack);
-            el.classList.toggle('border-black', !isBlack);
-        });
-        
-        themeIconBgs.forEach(el => {
-            el.classList.toggle('bg-white/10', isBlack);
-            el.classList.toggle('bg-black/10', !isBlack);
-        });
-
-        document.querySelector('.theme-footer').classList.toggle('bg-black/80', isBlack);
-        document.querySelector('.theme-footer').classList.toggle('border-white/10', isBlack);
-        document.querySelector('.theme-footer').classList.toggle('bg-white/80', !isBlack);
-        document.querySelector('.theme-footer').classList.toggle('border-black/10', !isBlack);
-        
-        glitchOverlay.classList.toggle('opacity-100', isBlack);
-        glitchOverlay.classList.toggle('opacity-5', !isBlack);
-
-        updateActiveNav(document.querySelector('section.reveal-active')?.id || 'about');
-        generateWaves();
-    };
-
-    const generateWaves = () => {
-        const strokeColor = currentTheme === 'black' ? 'white' : 'black';
-        let svgContent = '';
-        for (let i = 0; i < 5; i++) {
-            svgContent += `<path key="${i}" d="M0,${200 + i * 150} Q250,${100 + i * 100} 500,${200 + i * 150} T1000,${200 + i * 150}" fill="none" stroke="${strokeColor}" stroke-width="0.5">
-                <animate attributeName="d" values="M0,${200 + i * 150} Q250,${100 + i * 100} 500,${200 + i * 150} T1000,${200 + i * 150}; M0,${200 + i * 150} Q250,${300 + i * 100} 500,${200 + i * 150} T1000,${200 + i * 150}; M0,${200 + i * 150} Q250,${100 + i * 100} 500,${200 + i * 150} T1000,${200 + i * 150}" dur="${5 + i * 2}s" repeatCount="indefinite" />
-            </path>`;
-        }
-        for (let i = 0; i < 15; i++) {
-            svgContent += `<line key="line-${i}" x1="${Math.random() * 1000}" y1="${Math.random() * 1000}" x2="${Math.random() * 1000}" y2="${Math.random() * 1000}" stroke="${strokeColor}" stroke-width="0.3" stroke-dasharray="5,5" opacity="0.5">
-                <animate attributeName="opacity" values="0.1;0.6;0.1" dur="${3 + i}s" repeatCount="indefinite" />
-            </line>`;
-        }
-        wavesSVG.innerHTML = svgContent;
-    };
-
-    const startSnowfall = () => {
-        stopSnowfall();
-        const count = 100;
-        const color = currentTheme === 'black' ? 'white' : 'rgba(0,0,0,0.4)';
-        for (let i = 0; i < count; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'snow-particle';
-            particle.style.left = `${Math.random() * window.innerWidth}px`;
-            particle.style.top = `${Math.random() * window.innerHeight}px`;
-            const size = Math.random() * 3 + 1;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.backgroundColor = color;
-            particle.dataset.speed = Math.random() * 2 + 1;
-            snowfallContainer.appendChild(particle);
-        }
-
-        snowInterval = setInterval(() => {
-            const particles = document.querySelectorAll('.snow-particle');
-            particles.forEach(p => {
-                let y = parseFloat(p.style.top) + parseFloat(p.dataset.speed);
-                let x = parseFloat(p.style.left) + Math.sin(y / 30);
-                p.style.top = `${y % window.innerHeight}px`;
-                p.style.left = `${x % window.innerWidth}px`;
-            });
-        }, 30);
-    };
-
-    const stopSnowfall = () => {
-        clearInterval(snowInterval);
-        snowfallContainer.innerHTML = '';
-    };
-
-    const showToast = (message) => {
-        const toastId = `toast-${Date.now()}`;
-        const toastHTML = `
-            <div id="${toastId}" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] animate-bounce">
-              <div class="bg-red-900/80 border border-red-500 backdrop-blur-xl px-6 py-3 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center gap-3">
-                <i class="fas fa-exclamation-triangle text-red-400"></i>
-                <span class="text-white font-medium mono-font text-sm">${message}</span>
-              </div>
-            </div>`;
-        toastContainer.innerHTML = toastHTML;
-        setTimeout(() => {
-            const toastEl = document.getElementById(toastId);
-            if (toastEl) toastEl.remove();
-        }, 4000);
-    };
+    <div class="grid" id="keysGrid"></div>
     
-    const copyToClipboard = async (text) => {
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch (err) {
-            console.error('Failed to copy!', err);
-        }
-    };
+    <div class="info-grid">
+      <div class="info-card">
+        <h3 class="info-title">
+          <i data-lucide="book-open"></i>
+          Инструкция
+        </h3>
+        <ul class="instruction-list">
+          <li>
+            <div class="step-num">1</div> Выберите нужный список и скопируйте ключ
+          </li>
+          <li>
+            <div class="step-num">2</div> Откройте ваш VPN-клиент (V2RayNG, V2Box, Nekobox)
+          </li>
+          <li>
+            <div class="step-num">3</div> Импортируйте профиль из буфера обмена
+          </li>
+          <li>
+            <div class="step-num">4</div> Подключитесь и наслаждайтесь свободой
+          </li>
+        </ul>
+      </div>
+      
+      <div class="info-card">
+        <h3 class="info-title">
+          <i data-lucide="users"></i>
+          Сообщество
+        </h3>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 10px;">
+          Подписывайтесь на наш канал в Telegram, чтобы получать обновления зеркал, новости об обходах и общаться с единомышленниками.
+        </p>
+        <a href="https://t.me/YoutubeUnBlockRU" target="_blank" class="tg-link">
+          <i data-lucide="send"></i>
+          YoutubeUnBlockRU
+        </a>
+      </div>
+    </div>
+  </main>
 
-    init();
-});
-</script>
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">Єто ◦ Ні ◦ Я | Это ◦ Не ◦ Я</div>
+      <p class="footer-copy mono">© 2026. Для образовательных целей. Ключи обновляются регулярно.</p>
+      
+      <button id="openDevModal" class="developer-badge">
+        <span class="status-dot"></span>
+        Создано ilushadev
+      </button>
+    </div>
+  </footer>
 
+  <!-- External JavaScript -->
+  <script src="index.js"></script>
 </body>
 </html>
